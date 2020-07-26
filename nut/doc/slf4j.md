@@ -49,6 +49,7 @@ private static Logger logger = LoggerFactory.getLogger(Xxx.class);
 ```
 
 ## 2、配置
+在resources目录下新建 <strong>log4j.properties</strong> 文件，内容参考如下：
 
 ```properties
 log4j.rootLogger=debug, console
