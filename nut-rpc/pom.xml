@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.yrx.squirrel</groupId>
-    <artifactId>nut</artifactId>
+    <artifactId>nut-rpc</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>nut-spring</module>
-        <module>nut-java</module>
-        <module>nut-grpc</module>
+        <module>nut-rpc-server</module>
+        <module>nut-rpc-client</module>
+        <module>nut-rpc-contract</module>
     </modules>
 
     <dependencies>
@@ -41,7 +41,6 @@
         </dependency>
         <!-- log end -->
     </dependencies>
-
 
     <build>
         <pluginManagement>
