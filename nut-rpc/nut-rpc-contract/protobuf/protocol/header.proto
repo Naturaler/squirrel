@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package protocol;
+
+option java_package = "com.yrx.squirrel.nut.rpc.contract.rpc.protocol";
+
+message Header {
+  string version = 1;
+  int32 header_length = 2;
+
+}

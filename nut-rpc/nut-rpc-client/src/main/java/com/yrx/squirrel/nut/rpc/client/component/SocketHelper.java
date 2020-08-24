@@ -1,8 +1,10 @@
 package com.yrx.squirrel.nut.rpc.client.component;
 
 import com.yrx.squirrel.nut.rpc.contract.ParameterDTO;
+import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.Header;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,8 +29,11 @@ public class SocketHelper {
             OutputStream outputStream = socket.getOutputStream();
             String message = constructMsg(targetClass, targetMethod, parameters);
             log.info("message send to server: {}", message);
-            socket.getOutputStream().write(message.getBytes("UTF-8"));
-            //通过shutdownOutput高速服务器已经发送完数据，后续只能接受数据
+            // socket.getOutputStream().write(message.getBytes("UTF-8"));
+            byte[] payload = createByte();
+            socket.getOutputStream().write(header(payload.length));
+            socket.getOutputStream().write(payload);
+            //通过shutdownOutput告诉服务器已经发送完数据，后续只能接受数据
             socket.shutdownOutput();
 
             InputStream inputStream = socket.getInputStream();
@@ -52,6 +57,19 @@ public class SocketHelper {
         }
     }
 
+    private static byte[] header(int length) {
+        Header header = Header.builder()
+                .magic((short) 0)
+                .length(length)
+                .extHeaderLength((short) 0)
+                .version((byte) 1)
+                .msgType((byte) 1)
+                .serialization((byte) 0)
+                .seq((short) 1)
+                .build();
+        return header.getBytes();
+    }
+
     private static String constructMsg(Class targetClass, String targetMethod, List<ParameterDTO<String>> parameters) {
         StringJoiner joiner = new StringJoiner("|");
         joiner.add(targetClass.getTypeName());
@@ -64,5 +82,50 @@ public class SocketHelper {
         StringJoiner joiner = new StringJoiner(",");
         parameters.forEach(item -> joiner.add(item.toString()));
         return joiner.toString();
+    }
+
+    private static byte[] createByte() throws IOException {
+        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Builder personBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.newBuilder();
+        // personTest 赋值
+        personBuilder.setName("Jet Chen");
+        personBuilder.setEmail("ckk505214992@gmail.com");
+        personBuilder.setSex(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Sex.MALE);
+
+        // 内部的 PhoneNumber 构造器
+        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.Builder phoneNumberBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.newBuilder();
+        // PhoneNumber 赋值
+        phoneNumberBuilder.setType(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.PhoneType.MOBILE);
+        phoneNumberBuilder.setNumber("17717037257");
+
+        // personTest 设置 PhoneNumber
+        personBuilder.addPhone(phoneNumberBuilder);
+
+        // 生成 personTest 对象
+        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest personTest = personBuilder.build();
+
+        /** Step2：序列化和反序列化 */
+        // 方式一 byte[]：
+        // 序列化
+//            byte[] bytes = personTest.toByteArray();
+        // 反序列化
+//            PersonTestProtos.PersonTest personTestResult = PersonTestProtos.PersonTest.parseFrom(bytes);
+//            System.out.println(String.format("反序列化得到的信息，姓名：%s，性别：%d，手机号：%s", personTestResult.getName(), personTest.getSexValue(), personTest.getPhone(0).getNumber()));
+
+
+        // 方式二 ByteString：
+        // 序列化
+//            ByteString byteString = personTest.toByteString();
+//            System.out.println(byteString.toString());
+        // 反序列化
+//            PersonTestProtos.PersonTest personTestResult = PersonTestProtos.PersonTest.parseFrom(byteString);
+//            System.out.println(String.format("反序列化得到的信息，姓名：%s，性别：%d，手机号：%s", personTestResult.getName(), personTest.getSexValue(), personTest.getPhone(0).getNumber()));
+
+
+        // 方式三 InputStream
+        // 粘包,将一个或者多个protobuf 对象字节写入 stream
+        // 序列化
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        personTest.writeDelimitedTo(byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
     }
 }

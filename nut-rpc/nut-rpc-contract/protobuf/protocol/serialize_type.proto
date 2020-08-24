@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package protocol;
+
+option java_package = "com.yrx.squirrel.nut.rpc.contract.rpc.protocol";
+
+enum SerializeType {
+  PROTOCOL_BUFFERS = 0;
+  JSON = 3;
+  XML = 5;
+}

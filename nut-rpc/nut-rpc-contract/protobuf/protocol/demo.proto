@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package protocol;
+
+option java_package = "com.yrx.squirrel.nut.rpc.contract.rpc.protocol";
+option java_outer_classname = "QueryReqOuter";
+
+message QueryReq {
+  string user = 1;
+  string seq = 2;
+}

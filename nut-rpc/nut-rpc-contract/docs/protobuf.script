@@ -1,0 +1,3 @@
+protoc --proto_path=.\  --java_out=..\..\src\main\java\ .\header.proto
+
+protoc --proto_path=.\  --java_out=..\..\src\main\java\ .\nut-rpc-contract\protobuf\protocol\demo.proto
