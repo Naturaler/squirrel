@@ -2,6 +2,10 @@ package com.yrx.squirrel.nut.rpc.contract.rpc.protocol;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import static com.yrx.squirrel.nut.rpc.contract.util.ByteUtils.int2bytes;
 import static com.yrx.squirrel.nut.rpc.contract.util.ByteUtils.short2bytes;
@@ -11,6 +15,7 @@ import static com.yrx.squirrel.nut.rpc.contract.util.ByteUtils.short2bytes;
  */
 @Data
 @Builder
+@Slf4j
 public class Header {
     /**
      * 魔术位：2byte
@@ -52,21 +57,19 @@ public class Header {
         byte serialization = getSerialization();
         byte[] seq = short2bytes(getSeq());
 
-        byte[] bytes = new byte[13];
-        bytes[0] = magic[0];
-        bytes[1] = magic[1];
-        bytes[2] = length[0];
-        bytes[3] = length[1];
-        bytes[4] = length[2];
-        bytes[5] = length[3];
-        bytes[6] = extHeaderLength[0];
-        bytes[7] = extHeaderLength[1];
-        bytes[8] = version;
-        bytes[9] = msgType;
-        bytes[10] = serialization;
-        bytes[11] = seq[0];
-        bytes[12] = seq[1];
-        return bytes;
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        try {
+            byteOutputStream.write(magic);
+            byteOutputStream.write(length);
+            byteOutputStream.write(extHeaderLength);
+            byteOutputStream.write(version);
+            byteOutputStream.write(msgType);
+            byteOutputStream.write(serialization);
+            byteOutputStream.write(seq);
+        } catch (IOException e) {
+            log.error("header getBytes error! header: {}", this.toString(), e);
+        }
+        return byteOutputStream.toByteArray();
 
     }
 
