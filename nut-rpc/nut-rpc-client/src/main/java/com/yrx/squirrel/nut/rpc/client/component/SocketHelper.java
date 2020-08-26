@@ -126,6 +126,21 @@ public class SocketHelper {
         // 序列化
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         personTest.writeDelimitedTo(byteArrayOutputStream);
-        return byteArrayOutputStream.toByteArray();
+        // byte[] byteArray = byteArrayOutputStream.toByteArray();
+        log.info("client byte array: ");
+        // for (byte b : byteArray) {
+        //     System.out.print(b);
+        // }
+        // System.out.println();
+        byte[] bytes = personTest.toByteArray();
+        // for (byte b : bytes) {
+        //     System.out.print(b);
+        // }
+        // System.out.println();
+        // PersonTestProtos.PersonTest demo01 = PersonTestProtos.PersonTest.parseFrom(bytes);
+        // log.info("client demo: {}", demo01);
+        // PersonTestProtos.PersonTest demo = PersonTestProtos.PersonTest.parseFrom(byteArray);
+        // log.info("client demo: {}", demo);
+        return bytes;
     }
 }
