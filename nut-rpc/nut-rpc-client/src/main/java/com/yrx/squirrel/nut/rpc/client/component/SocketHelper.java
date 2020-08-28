@@ -1,6 +1,7 @@
 package com.yrx.squirrel.nut.rpc.client.component;
 
 import com.yrx.squirrel.nut.rpc.contract.ParameterDTO;
+import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.BlogReqOuter;
 import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.Header;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -31,8 +33,12 @@ public class SocketHelper {
             log.info("message send to server: {}", message);
             // socket.getOutputStream().write(message.getBytes("UTF-8"));
             byte[] payload = createByte();
-            socket.getOutputStream().write(header(payload.length));
+            socket.getOutputStream().write(header(payload.length, (short) 1));
             socket.getOutputStream().write(payload);
+
+            byte[] payload02 = blogReq();
+            socket.getOutputStream().write(header(payload.length, (short) 2));
+            socket.getOutputStream().write(payload02);
             //通过shutdownOutput告诉服务器已经发送完数据，后续只能接受数据
             socket.shutdownOutput();
 
@@ -57,7 +63,15 @@ public class SocketHelper {
         }
     }
 
-    private static byte[] header(int length) {
+    private static byte[] blogReq() {
+        BlogReqOuter.BlogReq.Builder builder = BlogReqOuter.BlogReq.newBuilder();
+        builder.setAuthor("韶华");
+        builder.setTitle("光阴如梭");
+        builder.setDate(new Date().getTime());
+        return builder.build().toByteArray();
+    }
+
+    private static byte[] header(int length, short seq) {
         Header header = Header.builder()
                 .magic((short) 0)
                 .length(length)
@@ -65,7 +79,7 @@ public class SocketHelper {
                 .version((byte) 1)
                 .msgType((byte) 1)
                 .serialization((byte) 0)
-                .seq((short) 1)
+                .seq(seq)
                 .build();
         return header.getBytes();
     }
@@ -133,6 +147,7 @@ public class SocketHelper {
         // }
         // System.out.println();
         byte[] bytes = personTest.toByteArray();
+        log.info("client send byte length: {}", bytes.length);
         // for (byte b : bytes) {
         //     System.out.print(b);
         // }
