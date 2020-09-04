@@ -40,6 +40,12 @@
             <version>1.18.12</version>
         </dependency>
         <!-- log end -->
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
+        </dependency>
     </dependencies>
 
 
