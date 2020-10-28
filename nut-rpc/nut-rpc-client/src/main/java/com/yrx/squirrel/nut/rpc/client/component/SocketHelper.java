@@ -1,6 +1,7 @@
 package com.yrx.squirrel.nut.rpc.client.component;
 
 import com.yrx.squirrel.nut.rpc.contract.ParameterDTO;
+import com.yrx.squirrel.nut.rpc.contract.PersonTestProtos;
 import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.BlogReqOuter;
 import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.Header;
 import lombok.extern.slf4j.Slf4j;
@@ -99,23 +100,23 @@ public class SocketHelper {
     }
 
     private static byte[] createByte() throws IOException {
-        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Builder personBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.newBuilder();
+        PersonTestProtos.PersonTest.Builder personBuilder = PersonTestProtos.PersonTest.newBuilder();
         // personTest 赋值
         personBuilder.setName("Jet Chen");
         personBuilder.setEmail("ckk505214992@gmail.com");
-        personBuilder.setSex(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Sex.MALE);
+        personBuilder.setSex(PersonTestProtos.PersonTest.Sex.MALE);
 
         // 内部的 PhoneNumber 构造器
-        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.Builder phoneNumberBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.newBuilder();
+        PersonTestProtos.PersonTest.PhoneNumber.Builder phoneNumberBuilder = PersonTestProtos.PersonTest.PhoneNumber.newBuilder();
         // PhoneNumber 赋值
-        phoneNumberBuilder.setType(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.PhoneType.MOBILE);
+        phoneNumberBuilder.setType(PersonTestProtos.PersonTest.PhoneNumber.PhoneType.MOBILE);
         phoneNumberBuilder.setNumber("17717037257");
 
         // personTest 设置 PhoneNumber
         personBuilder.addPhone(phoneNumberBuilder);
 
         // 生成 personTest 对象
-        com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest personTest = personBuilder.build();
+        PersonTestProtos.PersonTest personTest = personBuilder.build();
 
         /** Step2：序列化和反序列化 */
         // 方式一 byte[]：

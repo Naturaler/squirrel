@@ -5,6 +5,7 @@ package com.yrx.squirrel.nut.rpc.client.api;
  */
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.yrx.squirrel.nut.rpc.contract.PersonTestProtos;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,23 +24,23 @@ public class ProtoTest {
         try {
             /** Step1：生成 personTest 对象 */
             // personTest 构造器
-            com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Builder personBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.newBuilder();
+            PersonTestProtos.PersonTest.Builder personBuilder = PersonTestProtos.PersonTest.newBuilder();
             // personTest 赋值
             personBuilder.setName("Jet Chen");
             personBuilder.setEmail("ckk505214992@gmail.com");
-            personBuilder.setSex(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.Sex.MALE);
+            personBuilder.setSex(PersonTestProtos.PersonTest.Sex.MALE);
 
             // 内部的 PhoneNumber 构造器
-            com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.Builder phoneNumberBuilder = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.newBuilder();
+            PersonTestProtos.PersonTest.PhoneNumber.Builder phoneNumberBuilder = PersonTestProtos.PersonTest.PhoneNumber.newBuilder();
             // PhoneNumber 赋值
-            phoneNumberBuilder.setType(com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.PhoneNumber.PhoneType.MOBILE);
+            phoneNumberBuilder.setType(PersonTestProtos.PersonTest.PhoneNumber.PhoneType.MOBILE);
             phoneNumberBuilder.setNumber("17717037257");
 
             // personTest 设置 PhoneNumber
             personBuilder.addPhone(phoneNumberBuilder);
 
             // 生成 personTest 对象
-            com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest personTest = personBuilder.build();
+            PersonTestProtos.PersonTest personTest = personBuilder.build();
 
             /** Step2：序列化和反序列化 */
             // 方式一 byte[]：
@@ -68,7 +69,7 @@ public class ProtoTest {
             personTest.writeDelimitedTo(byteArrayOutputStream);
             // 反序列化，从 steam 中读取一个或者多个 protobuf 字节对象
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest personTestResult = com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos.PersonTest.parseDelimitedFrom(byteArrayInputStream);
+            PersonTestProtos.PersonTest personTestResult = PersonTestProtos.PersonTest.parseDelimitedFrom(byteArrayInputStream);
             System.out.println(String.format("反序列化得到的信息，姓名：%s，性别：%d，手机号：%s", personTestResult.getName(), personTest.getSexValue(), personTest.getPhone(0).getNumber()));
 
         } catch (InvalidProtocolBufferException e) {
