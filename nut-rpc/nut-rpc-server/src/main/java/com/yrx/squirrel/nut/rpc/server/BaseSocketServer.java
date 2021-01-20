@@ -1,8 +1,8 @@
 package com.yrx.squirrel.nut.rpc.server;
 
-import com.yrx.squirrel.nut.rpc.client.api.PersonTestProtos;
 import com.yrx.squirrel.nut.rpc.contract.IHelloWorld;
 import com.yrx.squirrel.nut.rpc.contract.ParameterDTO;
+import com.yrx.squirrel.nut.rpc.contract.PersonTestProtos;
 import com.yrx.squirrel.nut.rpc.contract.rpc.protocol.BlogReqOuter;
 import com.yrx.squirrel.nut.rpc.contract.util.ByteUtils;
 import lombok.extern.slf4j.Slf4j;

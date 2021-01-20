@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>sql脚本</title>
+</head>
+<body>
+<form th:action="@{/sql/metadata/build/docs/}" th:object="${sqlSourceVO}" method="post">
+    <input type="text" name="inputSql" placeholder="sql脚本"><br/>
+    <input type="submit" value="提交"/>
+</form>
+</body>
+</html>
