@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/book/}" method="post">
+    <!--判断book是否为空来确定添加还是修改-->
+    <input type="hidden" name="_method" th:value="put" th:if="${book!=null}" ><br/>
+
+    <input type="text" name="isbn" th:value="${book!=null? book.isbn : ''}" placeholder="编号"><br/>
+    <input type="text" name="name" th:value="${book!=null? book.name : ''}" placeholder="书名"><br/>
+    <input type="text" name="price" th:value="${book!=null? book.price : ''}" placeholder="价格"><br/>
+    <input type="text" name="publishDate" th:value="${book!=null? #dates.format(book.publishDate,'yyyy-MM-dd'): ''}" placeholder="出版日期"><br/>
+    <input type="submit"  value="提交"/>
+</form>
+</body>
+</html>

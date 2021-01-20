@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>元数据生成结果</title>
+</head>
+<body>
+<form th:action="@{/sql/metadata/docs/download/}" method="post" target="_blank" th:object="${dto}">
+    <table th:border="1" width="80%" contenteditable="true">
+        <tr>
+            <td>序号</td>
+            <td>isbn</td>
+            <td>name</td>
+            <td>price</td>
+        </tr>
+
+        <tr th:each="ddl, itemStat : *{ddlList}">
+            <td><input th:field="*{ddlList[__${itemStat.index}__].ddlType}"/></td>
+            <td><input th:field="*{ddlList[__${itemStat.index}__].schema}"/></td>
+            <td><input th:field="*{ddlList[__${itemStat.index}__].table}"/></td>
+            <td><input th:field="*{ddlList[__${itemStat.index}__].column}"/></td>
+        </tr>
+    </table>
+    <input type="submit" value="提交"/>
+</form>
+</body>
+</html>
