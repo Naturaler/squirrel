@@ -1,7 +1,6 @@
 package com.yrx.squirrel.nut.rpc.client.api;
 
-import com.yrx.squirrel.nut.rpc.client.service.DemoService;
-import com.yrx.squirrel.nut.rpc.client.service.DemoService02;
+import com.yrx.squirrel.nut.rpc.client.proxy.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class DemoApi {
     @Autowired
-    private DemoService demoService;
-    @Autowired
-    private DemoService02 demoService02;
+    private ProxyService demoService;
+    // @Autowired
+    // private DemoService02 demoService02;
 
     @GetMapping("/proxy")
     public String proxy() {
         demoService.say("hello world");
-        demoService02.hello("hi world", 2);
+        // demoService02.hello("hi world", 2);
         return "good bye";
     }
 }

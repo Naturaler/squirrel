@@ -93,6 +93,32 @@
         </dependency>
         <!-- zookeeper end -->
 
+        <!-- dubbo start -->
+        <!-- https://mvnrepository.com/artifact/org.apache.dubbo/dubbo -->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.dubbo</groupId>-->
+<!--            <artifactId>dubbo</artifactId>-->
+<!--            <version>2.7.8</version>-->
+<!--        </dependency>-->
+        <!-- dubbo end -->
+
+        <!-- mybatis start -->
+        <!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+<!--        <dependency>-->
+<!--            <groupId>org.mybatis.spring.boot</groupId>-->
+<!--            <artifactId>mybatis-spring-boot-starter</artifactId>-->
+<!--            <version>2.0.1</version>-->
+<!--        </dependency>-->
+
+        <!-- mybatis end -->
+
+        <!-- https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser -->
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>3.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

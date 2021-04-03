@@ -1,4 +1,4 @@
 #
-GET http://localhost:9090/demo/proxy
+GET http://localhost:9595/demo/proxy
 
 ###

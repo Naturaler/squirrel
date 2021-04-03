@@ -1,0 +1,6 @@
+POST http://localhost:8080/sql/metadata/build/docs
+Content-Type: application/json
+
+{
+  "inputSql": "alter table TEMP_BATCH_SCORE_31D add constraint PK_TEMP_BATCH_SCORE_31D primary key (cust_no);"
+}

@@ -3,8 +3,11 @@ package com.yrx.dawdler.enumeration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+/**
+ * Created by r.x on 2021/4/3.
+ */
 @Getter
+@AllArgsConstructor
 public enum DdlTypeEnum {
     CREATE_TABLE("CREATE_TABLE", "新增数据表"),
     DROP_TABLE("DROP_TABLE", "删除数据表"),
@@ -18,6 +21,15 @@ public enum DdlTypeEnum {
     MODIFY_PRIMARY_KEY("MODIFY_PRIMARY_KEY", "修改主键"),
     CREATE_INDEX("CREATE_INDEX", "新增主键"),
     ;
+
     private String code;
     private String desc;
+
+    public static String[] list() {
+        String[] result = new String[(DdlTypeEnum.values().length)];
+        for (int i = 0; i < DdlTypeEnum.values().length; i++) {
+            result[i] = DdlTypeEnum.values()[i].desc;
+        }
+        return result;
+    }
 }

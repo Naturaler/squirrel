@@ -1,0 +1,49 @@
+预期功能：
+1、可切换导出模板
+2、可选择导出格式：json、excel、xml
+
+代码要求：
+1、扩展性
+    a、支持插件化导出功能配置
+    b、
+2、性能
+    a、快速解析
+
+
+新增数据表：CreateTable
+create table table_name(id number(32) not null constraint pk_table_name primary key, column02 varchar2(32), create_time date);
+
+删除数据表：Drop
+drop table table_name;
+
+修改表名：
+rename table_name to table_name_new;（不支持该语法）
+alter table table_name rename to table_name_new;（不支持该语法）
+
+增加字段：Alter
+alter table table_name add is_valid char;
+
+删除字段：Alter
+alter table table_name drop column column_name;
+
+修改字段名称：Alter
+alter table table_name rename column column_name to column_name_new
+
+修改字段逻辑：
+（日常系统不常用）
+
+修改字段格式：Alter
+alter table table_name modify column_name varchar2(32);
+
+删除主键：
+alter table table_name drop primary key;（不支持该语法）
+
+修改主键：
+alter table table_name rename constraint pk_name to "pk_name_new";（不支持该语法）
+
+新增主键：Alter
+alter table table_name add constraint pk_name unique(column1, column2);
+
+新建索引：CreateIndex
+create index index_name on table_name(column1, column2, ...);
+

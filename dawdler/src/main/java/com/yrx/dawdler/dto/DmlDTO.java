@@ -1,15 +1,14 @@
 package com.yrx.dawdler.dto;
 
-import com.yrx.dawdler.enumeration.DmlTypeEnum;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Objects;
 
+/**
+ * Created by r.x on 2021/3/21.
+ */
 @Data
 public class DmlDTO {
-    public DmlDTO() {
-    }
-
     /**
      * 原始sql
      */
@@ -17,11 +16,11 @@ public class DmlDTO {
     /**
      * 变更类型
      */
-    private DmlTypeEnum dmlType;
+    private String dmlType;
     /**
-     * Schema名称
+     * schema名称
      */
-    private String schema = "collectsm";
+    private String schema;
     /**
      * 表英文名
      */
@@ -29,9 +28,30 @@ public class DmlDTO {
     /**
      * 涉及字段
      */
-    private List<String> columns;
+    private String column;
     /**
      * 变更说明/备注
      */
     private String remark;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DmlDTO dmlDTO = (DmlDTO) o;
+        return Objects.equals(dmlType, dmlDTO.dmlType) &&
+                Objects.equals(schema, dmlDTO.schema) &&
+                Objects.equals(table, dmlDTO.table) &&
+                Objects.equals(column, dmlDTO.column) &&
+                Objects.equals(remark, dmlDTO.remark);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dmlType, schema, table, column, remark);
+    }
 }

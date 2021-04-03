@@ -1,13 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>sql脚本</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="/css/sqlDocs.css">
+  <script type="text/javascript" src="/js/multiFile.js"></script>
+  <title>元数据生成工具</title>
 </head>
 <body>
-<form th:action="@{/sql/metadata/build/docs/}" th:object="${sqlSourceVO}" method="post">
-    <input type="text" name="inputSql" placeholder="sql脚本"><br/>
-    <input type="submit" value="提交"/>
-</form>
+<div class="tab_switch">
+  <div class="tab_switch_content">
+    <input type="button" value="上传SQL文件" class="tab_button_selected" id="tab_button_upload"
+           onclick="switch_tab('upload_file','input_sql','tab_button_upload','tab_button_input')">
+    <input type="button" value="提交SQL语句" class="tab_button_def" id="tab_button_input"
+           onclick="switch_tab('input_sql','upload_file','tab_button_input','tab_button_upload')">
+  </div>
+</div>
+<div class="show_on" id="upload_file">
+  <form method="post" enctype="multipart/form-data" action="/sql/metadata/batch/upload">
+    <div class="table_content">
+      <div class="table_outline">
+        <div class="table_outline_content">
+          <input type="button" value="更多文件" onclick="oneMoreFile()" class="button">
+          <input type="submit" value="上传" class="button">
+        </div>
+      </div>
+
+      <table id="fileList">
+        <tr>
+          <th>批量文件上传</th>
+          <th>单个文件上传</th>
+        </tr>
+        <tr>
+          <td><input type="file" name="file" multiple></td>
+          <td><input type="file" name="file"></td>
+        </tr>
+      </table>
+
+      <table th:object="${dbConnectionConfig}">
+        <tr>
+          <th>数据库配置</th>
+          <th>环境</th>
+          <th>url</th>
+          <th>username</th>
+          <th>password</th>
+        </tr>
+
+        <tr th:each="item:${dbConnectionConfig}">
+          <td><input type="radio" name="profile" th:value="${item.profile}" th:checked="${item.profile} eq 'dev'"></td>
+          <td th:text="${item.profile}"></td>
+          <td th:text="${item.url}"></td>
+          <td th:text="${item.username}"></td>
+          <td th:text="${item.password}"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="profile" value="manual"></td>
+          <td>自定义</td>
+          <td><input type="text" name="dbUrl" placeholder="jdbc url"></td>
+          <td><input type="text" name="dbUsername" placeholder="jdbc username"></td>
+          <td><input type="text" name="dbPassword" placeholder="jdbc password"></td>
+        </tr>
+      </table>
+    </div>
+  </form>
+</div>
+
+<div class="show_off" id="input_sql">
+  <form th:action="@{/sql/metadata/build/docs/}" th:object="${sqlSourceVO}" method="post">
+    <div class="table_content">
+      <div class="table_outline">
+        <div class="table_outline_content">
+          <input type="submit" value="提交" class="button">
+        </div>
+      </div>
+
+      <textarea name="inputSql" placeholder="sql脚本"></textarea>
+
+      <table th:object="${dbConnectionConfig}">
+        <tr>
+          <th>数据库配置</th>
+          <th>环境</th>
+          <th>url</th>
+          <th>username</th>
+          <th>password</th>
+        </tr>
+        <tr th:each="item:${dbConnectionConfig}">
+          <td><input type="radio" name="profile" th:value="${item.profile}" th:checked="${item.profile} eq 'dev'"></td>
+          <td th:text="${item.profile}"></td>
+          <td th:text="${item.url}"></td>
+          <td th:text="${item.username}"></td>
+          <td th:text="${item.password}"></td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="profile" value="manual"></td>
+          <td>自定义</td>
+          <td><input type="text" name="dbUrl" placeholder="jdbc url"></td>
+          <td><input type="text" name="dbUsername" placeholder="jdbc username"></td>
+          <td><input type="text" name="dbPassword" placeholder="jdbc password"></td>
+        </tr>
+      </table>
+    </div>
+  </form>
+</div>
 </body>
 </html>
