@@ -1,34 +1,38 @@
 package com.yrx.dawdler.parser;
 
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.delete.Delete;
-import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.update.Update;
+import com.yrx.dawdler.annotation.DmlParserFlag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by r.x on 2021/4/3.
+ */
+@Slf4j
 @Component
-public class DmlParserFactory {
-    @Resource(name = "insertParser")
-    private IDmlParser insertParser;
-    @Resource(name = "deleteParser")
-    private IDmlParser deleteParser;
-    @Resource(name = "updateParser")
-    private IDmlParser updateParser;
-    private static final Map<Class<? extends Statement>, IDmlParser> mapping = new HashMap<>(3);
+public class DmlParserFactory implements ApplicationListener<ContextRefreshedEvent> {
+    private static final Map<Class<?>, IDmlParser> mapping = new HashMap<>();
 
-    public IDmlParser getParser(Class<? extends Statement> source) {
+    public IDmlParser getParser(Class<?> source) {
         return mapping.get(source);
     }
 
-    @PostConstruct
-    private void init() {
-        mapping.put(Insert.class, insertParser);
-        mapping.put(Delete.class, deleteParser);
-        mapping.put(Update.class, updateParser);
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        ApplicationContext applicationContext = event.getApplicationContext();
+        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(DmlParserFlag.class);
+        for (Object parser : beans.values()) {
+            if (parser instanceof IDmlParser) {
+                DmlParserFlag annotation = parser.getClass().getAnnotation(DmlParserFlag.class);
+                if (annotation != null) {
+                    mapping.put(annotation.target(), (IDmlParser) parser);
+                }
+            }
+        }
     }
 }

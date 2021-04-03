@@ -1,27 +1,125 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>元数据生成结果</title>
+  <meta charset="UTF-8">
+  <script type="text/javascript" src="/js/multiFile.js"></script>
+  <script type="text/javascript" src="/js/tableManager.js"></script>
+  <link rel="stylesheet" type="text/css" href="/css/sqlDocs.css">
+  <title>元数据生成结果</title>
 </head>
 <body>
 <form th:action="@{/sql/metadata/docs/download/}" method="post" target="_blank" th:object="${dto}">
-    <table th:border="1" width="80%" contenteditable="true">
+  <table>
+    <tr>
+      <th th:text="'总条数: ' + ${dto.size} + ', 成功条数: '+ ${dto.successSize}"></th>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <th th:text="'失败条数: ' + ${dto.failSize}" style="color: #ff000096"></th>
+    </tr>
+    <tr th:each="item:${dto.failList}">
+      <td th:text="${item}"></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <th th:text="'忽略条数: ' + ${dto.ignoreSize}" style="color: #ff000096"></th>
+    </tr>
+    <tr th:each="item:${dto.ignoreList}">
+      <td th:text="'【数量】: '+${item.value}+', 【SQL】: '+${item.key}"></td>
+    </tr>
+  </table>
+
+  <div class="tab_switch">
+    <div class="tab_switch_content">
+      <input type="button" value="表字段级元数据变更" class="tab_button_selected" id="tab_button_upload"
+             onclick="switch_tab('ddlContent','dmlContent','tab_button_upload','tab_button_input')">
+      <input type="button" value="数据变更" class="tab_button_def" id="tab_button_input"
+             onclick="switch_tab('dmlContent','ddlContent','tab_button_input','tab_button_upload')">
+      <input type="submit" value="下载" class="button">
+    </div>
+  </div>
+
+  <div id="ddlContent">
+    <div class="table_content">
+      <div class="table_outline">
+        <div class="table_outline_content">
+          <input type="button" value="新增空行" onclick="addDdlRow()" class="button">
+        </div>
+      </div>
+
+      <table id="ddlMetadata" class="hoverTable" contenteditable="false">
         <tr>
-            <td>序号</td>
-            <td>isbn</td>
-            <td>name</td>
-            <td>price</td>
+          <th>序号</th>
+          <th>变更类型</th>
+          <th>Schema名称</th>
+          <th>表/视图名</th>
+          <th>变更前元数据</th>
+          <th>变更后元数据</th>
+          <th>字段名称</th>
+          <th>字段格式</th>
+          <th>主键名称</th>
+          <th>变更说明/备注</th>
+          <th>操作</th>
         </tr>
 
         <tr th:each="ddl, itemStat : *{ddlList}">
-            <td><input th:field="*{ddlList[__${itemStat.index}__].ddlType}"/></td>
-            <td><input th:field="*{ddlList[__${itemStat.index}__].schema}"/></td>
-            <td><input th:field="*{ddlList[__${itemStat.index}__].table}"/></td>
-            <td><input th:field="*{ddlList[__${itemStat.index}__].column}"/></td>
+          <td th:text="${itemStat.index}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].ddlType}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].schema}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].table}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].metadataBefore}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].metadataAfter}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].column}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].columnType}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].primaryKey}"></td>
+          <td><input th:field="*{ddlList[__${itemStat.index}__].remark}"></td>
+          <td>
+            <input type="button" value="删除行" th:onclick="'deleteRow(\'ddlMetadata\', this)'"
+                   class="inline_button">
+          </td>
         </tr>
-    </table>
-    <input type="submit" value="提交"/>
+      </table>
+    </div>
+  </div>
+
+  <div id="dmlContent" class="show_off">
+    <div class="table_content">
+      <div class="table_outline">
+        <div class="table_outline_content">
+          <input type="button" value="新增空行" onclick="addDmlRow()" class="button">
+        </div>
+      </div>
+
+      <table id="dmlMetadata" class="hoverTable" contenteditable="false">
+        <tr>
+          <th>序号</th>
+          <th>变更类型</th>
+          <th>Schema名称</th>
+          <th>表英文名</th>
+          <th>涉及字段</th>
+          <th>变更说明/备注</th>
+          <th>操作</th>
+        </tr>
+
+        <tr th:each="dml, itemStat : *{dmlList}">
+          <td th:text="${itemStat.index}"></td>
+          <td><input th:field="*{dmlList[__${itemStat.index}__].dmlType}"></td>
+          <td><input th:field="*{dmlList[__${itemStat.index}__].schema}"></td>
+          <td><input th:field="*{dmlList[__${itemStat.index}__].table}"></td>
+          <td><input th:field="*{dmlList[__${itemStat.index}__].column}"></td>
+          <td><input th:field="*{dmlList[__${itemStat.index}__].remark}"></td>
+          <td>
+            <input type="button" value="删除行" th:onclick="'deleteRow(\'dmlMetadata\', this)'"
+                   class="inline_button">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
 </form>
 </body>
 </html>

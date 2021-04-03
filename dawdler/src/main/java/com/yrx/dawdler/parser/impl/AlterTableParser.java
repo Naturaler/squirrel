@@ -1,79 +1,139 @@
 package com.yrx.dawdler.parser.impl;
 
+import com.yrx.dawdler.annotation.DdlParserFlag;
+import com.yrx.dawdler.bo.DbMetadataBO;
+import com.yrx.dawdler.bo.ToParseSourceBO;
+import com.yrx.dawdler.component.IDbMetadataHelper;
+import com.yrx.dawdler.component.impl.DbMetadataHelper;
 import com.yrx.dawdler.dto.DdlDTO;
 import com.yrx.dawdler.enumeration.DdlTypeEnum;
 import com.yrx.dawdler.parser.IDdlParser;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.alter.AlterExpression;
 import net.sf.jsqlparser.statement.alter.AlterOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static com.yrx.dawdler.constant.CommonConstant.SCHEMA;
 
+/**
+ * Created by r.x on 2021/4/4.
+ */
 @Component
+@DdlParserFlag(target = Alter.class)
 public class AlterTableParser implements IDdlParser {
 
-    public static void main(String[] args) throws JSQLParserException {
-        String sql = "alter table table_name modify column_name varchar2(32);";
-//        String sql = "alter table table_name rename column column_name to column_name_new";
-//        String sql = "alter table table_name add is_valid char;";
-//        String sql = "alter table table_name add constraint pk_name unique(column1, column2);";
-        Statement statement = CCJSqlParserUtil.parse(sql);
-        Alter alter = (Alter) statement;
-        System.out.println("alter = " + alter);
-    }
-
     @Override
-    public DdlDTO parse(String source, Statement statement, String remark) {
-        Alter alter = (Alter) statement;
+    public List<DdlDTO> parse(ToParseSourceBO bo) {
+        List<DdlDTO> result = new ArrayList<>();
+
+        Alter alter = (Alter) bo.getStatement();
         DdlTypeEnum ddlType = identifyDdlType(alter);
+        if (ddlType == null) {
+            return Collections.emptyList();
+        }
         String table = extractTable(alter);
         String metadataBefore = "";
         String metadataAfter = "";
         String column = "";
         String columnType = "";
         String primaryKey = "";
-        if (ddlType != null) {
-            switch (ddlType) {
-                case ADD_COLUMN:
-                    column = alter.getAlterExpressions().get(0).getColumnName();
-                    columnType = alter.getAlterExpressions().get(0).getColDataTypeList().get(0).getColDataType().getDataType();
-                    break;
-                case RENAME_COLUMN_NAME:
-                case MODIFY_COLUMN_TYPE:
-                    // todo
-                    break;
-                case CREATE_INDEX:
-                    StringJoiner joiner = new StringJoiner(",");
-                    column = String.join(",", alter.getAlterExpressions().get(0).getIndex().getColumnsNames());
-                    primaryKey = alter.getAlterExpressions().get(0).getIndex().getName();
-                    break;
-                case DROP_COLUMN:
-                    break;
-            }
+        List<String> columnTypeArg;
+
+        switch (ddlType) {
+            case ADD_COLUMN:
+                List<AlterExpression.ColumnDataType> colData = alter.getAlterExpressions().get(0).getColDataTypeList();
+                for (AlterExpression.ColumnDataType columnDataType : colData) {
+                    column = columnDataType.getColumnName();
+                    columnType = columnDataType.getColDataType().getDataType();
+                    columnTypeArg = columnDataType.getColDataType().getArgumentsStringList();
+                    if (CollectionUtils.isNotEmpty(columnTypeArg)) {
+                        columnType += "(" + String.join(",", columnTypeArg) + ")";
+                    }
+                    DdlDTO dto = new DdlDTO();
+                    dto.setSource(bo.getSource());
+                    dto.setDdlType(ddlType.getDesc());
+                    dto.setSchema(SCHEMA);
+                    dto.setTable(table);
+                    dto.setMetadataBefore(metadataBefore);
+                    dto.setMetadataAfter(metadataAfter);
+                    dto.setColumn(column);
+                    dto.setColumnType(columnType);
+                    dto.setPrimaryKey(primaryKey);
+                    dto.setRemark(bo.getRemarkMapping().get((table + "." + column).toUpperCase()));
+
+                    result.add(dto);
+                }
+                break;
+            case RENAME_COLUMN_NAME:
+            case MODIFY_COLUMN_TYPE:
+                for (AlterExpression.ColumnDataType columnDataType : alter.getAlterExpressions().get(0).getColDataTypeList()) {
+                    column = columnDataType.getColumnName();
+                    columnType = columnDataType.getColDataType().getDataType();
+                    columnTypeArg = columnDataType.getColDataType().getArgumentsStringList();
+                    if (CollectionUtils.isNotEmpty(columnTypeArg)) {
+                        columnType += "(" + String.join(",", columnTypeArg) + ")";
+                    }
+                    metadataBefore = getCurrMetadata(bo, table, column);
+                    metadataAfter = columnType;
+
+                    DdlDTO dto = new DdlDTO();
+                    dto.setSource(bo.getSource());
+                    dto.setDdlType(ddlType.getDesc());
+                    dto.setSchema(SCHEMA);
+                    dto.setTable(table);
+                    dto.setMetadataBefore(metadataBefore);
+                    dto.setMetadataAfter(metadataAfter);
+                    dto.setColumn(column);
+                    dto.setColumnType(columnType);
+                    dto.setPrimaryKey(primaryKey);
+                    dto.setRemark(bo.getRemarkMapping().get(table + "." + column).toUpperCase());
+
+                    result.add(dto);
+                }
+                break;
+            case CREATE_INDEX:
+                column = String.join(",", alter.getAlterExpressions().get(0).getIndex().getColumnsNames());
+                primaryKey = alter.getAlterExpressions().get(0).getIndex().getName();
+
+                DdlDTO dto = new DdlDTO();
+                dto.setSource(bo.getSource());
+                dto.setDdlType(ddlType.getDesc());
+                dto.setSchema(SCHEMA);
+                dto.setTable(table);
+                dto.setMetadataBefore(metadataBefore);
+                dto.setMetadataAfter(metadataAfter);
+                dto.setColumn(column);
+                dto.setColumnType(columnType);
+                dto.setPrimaryKey(primaryKey);
+                dto.setRemark(bo.getRemarkMapping().get(table + "." + column).toUpperCase());
+
+                result.add(dto);
+                break;
+            case DROP_COLUMN:
+                break;
         }
-        DdlDTO dto = new DdlDTO();
-        dto.setSource(source);
-        dto.setDdlType(ddlType);
-        dto.setSchema(SCHEMA);
-        dto.setTable(table);
-        dto.setMetadataBefore(metadataBefore);
-        dto.setMetadataAfter(metadataAfter);
-        dto.setColumn(column);
-        dto.setColumnType(columnType);
-        dto.setPrimaryKey(primaryKey);
-        dto.setRemark(remark);
-        return dto;
+
+        return result;
     }
 
-    private DdlTypeEnum identifyDdlType(Alter statement) {
-        AlterExpression expression = statement.getAlterExpressions().get(0);
+    private String getCurrMetadata(ToParseSourceBO bo, String table, String column) {
+        IDbMetadataHelper IDbMetadataHelper = new DbMetadataHelper(bo.getDdlUrl(), bo.getDbUsername(), bo.getDbPassword());
+        DbMetadataBO tableMetadata = IDbMetadataHelper.getTableMetadata(table);
+
+        Optional<String> result = tableMetadata.getColumns().stream().filter(original -> original.getName().equals(column))
+                .map(DbMetadataBO.DbColumn::getType)
+                .findFirst();
+        return result.orElse("");
+    }
+
+    private DdlTypeEnum identifyDdlType(Alter alter) {
+        AlterExpression expression = alter.getAlterExpressions().get(0);
         AlterOperation operation = expression.getOperation();
         switch (operation) {
             case ADD:
@@ -92,13 +152,7 @@ public class AlterTableParser implements IDdlParser {
         }
     }
 
-    private String extractPrimaryKey(Alter createIndex) {
-//        List<String> columnsNames = createIndex.getIndex().getColumnsNames();
-//        return String.join(",", columnsNames);
-        return "";
-    }
-
-    private String extractTable(Alter statement) {
-        return statement.getTable().getName();
+    private String extractTable(Alter alter) {
+        return alter.getTable().getName();
     }
 }
